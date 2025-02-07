@@ -12,10 +12,15 @@ import InputErrorMessage from "../../components/input-error-message/input-error-
 ///Styles
 import { LoginContainer, LoginHeadline, LoginInputContainer, LoginSubtitle, LoginContent } from "./login.styles"
 
+interface LoginForm {
+    email: string;
+    password: string;
+}
+
 const LoginPage = () => {
-    const { register, formState: {errors}, handleSubmit } = useForm()
+    const { register, formState: {errors}, handleSubmit } = useForm<LoginForm>()
     
-    const handleSubmitPress = (data: any) => {
+    const handleSubmitPress = (data: LoginForm) => {
         console.log(data)
     }
 
@@ -45,7 +50,7 @@ const LoginPage = () => {
                 </LoginInputContainer>
                 <LoginInputContainer>
                     <p>Senha</p>
-                    <CustomInput hasError={!!errors?.password} placeholder="Digite sua senha" {...register('password', {required: true})}></CustomInput>
+                    <CustomInput hasError={!!errors?.password} placeholder="Digite sua senha" {...register('password', {required: true})} type="password"></CustomInput>
                     {errors?.password?.type === "required" && (
                         <InputErrorMessage>A senha é obrigatoria.</InputErrorMessage>
                     )}
