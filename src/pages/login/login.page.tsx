@@ -1,5 +1,6 @@
 import { BsGoogle } from "react-icons/bs";
 import {FiLogIn} from "react-icons/fi"
+import { useForm } from 'react-hook-form'
 
 //Components
 import CustomButton from "../../components/custom-button/custom-buttom.component"
@@ -10,6 +11,13 @@ import CustomInput from "../../components/custom-input/custom-input.component";
 import { LoginContainer, LoginHeadline, LoginInputContainer, LoginSubtitle, LoginContent } from "./login.styles"
 
 const LoginPage = () => {
+    const { register, formState: {errors}, handleSubmit } = useForm()
+    
+    const handleSubmitPress = (data: any) => {
+        console.log(data)
+    }
+
+    console.log(errors)
     return (
     <>
         <Header/>
@@ -21,13 +29,15 @@ const LoginPage = () => {
                 <LoginSubtitle>Ou entre com o seu e-mail</LoginSubtitle>
 
                 <LoginInputContainer>
-                    <CustomInput hasError={false} placeholder="Digite seu e-mail"></CustomInput>
+                    <p>E-mail</p>
+                    <CustomInput hasError={!!errors?.email} placeholder="Digite seu e-mail" {...register('email', {required: true})}></CustomInput>
                 </LoginInputContainer>
                 <LoginInputContainer>
-                    <CustomInput placeholder="Digite sua senha"></CustomInput>
+                    <p>Senha</p>
+                    <CustomInput hasError={!!errors?.password} placeholder="Digite sua senha" {...register('password', {required: true})}></CustomInput>
                 </LoginInputContainer>
 
-                <CustomButton startIcon={<FiLogIn size={18}/>}>
+                <CustomButton startIcon={<FiLogIn size={18}/>} onClick={() => handleSubmit(handleSubmitPress)()}>
                     Entrar
                 </CustomButton>
 
