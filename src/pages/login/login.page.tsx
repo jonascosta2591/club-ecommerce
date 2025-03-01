@@ -11,6 +11,8 @@ import InputErrorMessage from "../../components/input-error-message/input-error-
 
 ///Styles
 import { LoginContainer, LoginHeadline, LoginInputContainer, LoginSubtitle, LoginContent } from "./login.styles"
+import { AuthError, AuthErrorCodes, signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../config/firebase.config";
 
 interface LoginForm {
     email: string;
@@ -18,13 +20,20 @@ interface LoginForm {
 }
 
 const LoginPage = () => {
-    const { register, formState: {errors}, handleSubmit } = useForm<LoginForm>()
+    const { register, formState: {errors}, handleSubmit, setError } = useForm<LoginForm>()
     
-    const handleSubmitPress = (data: LoginForm) => {
-        console.log(data)
+    const handleSubmitPress = async (data: LoginForm) => {
+        try{
+            await signInWithEmailAndPassword(auth, data.email, data.password)
+        }catch(err){
+            const _err = err as AuthError
+           
+            if(_err.code === AuthErrorCodes.INVALID_IDP_RESPONSE){
+                return setError('email', {type: 'mismatch'})
+            }
+        }
     }
 
-    console.log(errors)
     return (
     <>
         <Header/>
@@ -46,7 +55,9 @@ const LoginPage = () => {
                     {errors?.email?.type === 'validate' && (
                         <InputErrorMessage>Email invalido</InputErrorMessage>
                     )}
-
+                    {errors?.email?.type === 'mismatch' && (
+                        <InputErrorMessage>Usuário ou senha invalidos</InputErrorMessage>
+                    )}
                 </LoginInputContainer>
                 <LoginInputContainer>
                     <p>Senha</p>
@@ -54,6 +65,7 @@ const LoginPage = () => {
                     {errors?.password?.type === "required" && (
                         <InputErrorMessage>A senha é obrigatoria.</InputErrorMessage>
                     )}
+                    
                 </LoginInputContainer>
 
                 <CustomButton startIcon={<FiLogIn size={18}/>} onClick={() => handleSubmit(handleSubmitPress)()}>
