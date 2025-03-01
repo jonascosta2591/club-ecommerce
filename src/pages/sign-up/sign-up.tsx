@@ -3,13 +3,19 @@ import validator from 'validator'
 import CustomButton from "../../components/custom-button/custom-buttom.component"
 import CustomInput from "../../components/custom-input/custom-input.component"
 import Header from "../../components/header/header.component"
+import InputErrorMessage from '../../components/input-error-message/input-error-message.component'
+
 
 import {FiLogIn} from 'react-icons/fi'
 import {useForm} from 'react-hook-form'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { addDoc, collection } from 'firebase/firestore'
 
 //styles
 import { SignUpContainer, SignUpContent, SignUpHeadline, SignUpInputContainer } from "./sign-up.styles"
-import InputErrorMessage from '../../components/input-error-message/input-error-message.component'
+
+
+import { auth, db } from '../../config/firebase.config'
 
 interface SignUpForm {
     nome: string;
@@ -20,14 +26,23 @@ interface SignUpForm {
 }
 
 const SignUpPage = () => {
-
-
     const {register, formState: {errors}, handleSubmit, watch} = useForm<SignUpForm>()
 
     const watchSenha = watch('senha')
 
-    const handleSubmitPress = (data: SignUpForm) => {
-        console.log(data)
+    const handleSubmitPress = async (data: SignUpForm) => {
+        try{
+            const user_credentials = await createUserWithEmailAndPassword(auth, data.email, data.senha)
+
+            await addDoc(collection(db, 'users'), {
+                id: user_credentials.user.uid,
+                firstName: data.nome,
+                lastName: data.sobrenome,
+                email: user_credentials.user.email
+            })
+        }catch(err){
+            console.log(err)
+        }
     }
 
     return (
