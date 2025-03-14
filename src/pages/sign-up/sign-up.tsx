@@ -33,12 +33,13 @@ const SignUpPage = () => {
     const handleSubmitPress = async (data: SignUpForm) => {
         try{
             const user_credentials = await createUserWithEmailAndPassword(auth, data.email, data.senha)
-
+            
             await addDoc(collection(db, 'users'), {
                 id: user_credentials.user.uid,
                 firstName: data.nome,
                 lastName: data.sobrenome,
-                email: user_credentials.user.email
+                email: user_credentials.user.email,
+                provider: 'firebase'
             })
         }catch(error){
             const _error = error as AuthError

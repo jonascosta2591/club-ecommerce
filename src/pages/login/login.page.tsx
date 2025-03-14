@@ -2,6 +2,8 @@ import { BsGoogle } from "react-icons/bs";
 import {FiLogIn} from "react-icons/fi"
 import { useForm } from 'react-hook-form'
 import validator from 'validator'
+import { addDoc, collection, getDoc, getDocs, query, where } from "firebase/firestore";
+import { AuthError, AuthErrorCodes, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 
 //Components
 import CustomButton from "../../components/custom-button/custom-buttom.component"
@@ -11,8 +13,9 @@ import InputErrorMessage from "../../components/input-error-message/input-error-
 
 ///Styles
 import { LoginContainer, LoginHeadline, LoginInputContainer, LoginSubtitle, LoginContent } from "./login.styles"
-import { AuthError, AuthErrorCodes, signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../config/firebase.config";
+
+//utilities
+import { auth, db, provider } from "../../config/firebase.config";
 
 interface LoginForm {
     email: string;
@@ -34,6 +37,26 @@ const LoginPage = () => {
         }
     }
 
+    const handleSubmitWithGoogle = async () => {
+        try{
+            const resultUserCredential = await signInWithPopup(auth, provider)
+
+            let user = await getDocs(query(collection(db, 'users'), where('id', '==', resultUserCredential.user.uid)))
+            
+            if(user.empty){
+                await addDoc(collection(db, 'users'), {
+                    id: resultUserCredential.user.uid,
+                    firstName: 'user google',
+                    lastName: 'user google',
+                    email: resultUserCredential.user.email,
+                    provider: 'google'
+                })
+            }
+        }catch(err){
+            console.log(err)
+        }
+    }
+
     return (
     <>
         <Header/>
@@ -41,7 +64,7 @@ const LoginPage = () => {
             <LoginContent>
             <LoginHeadline>Entre com a sua conta</LoginHeadline>
 
-                <CustomButton startIcon={<BsGoogle size={18}/>}>Entrar com o google</CustomButton>
+                <CustomButton startIcon={<BsGoogle size={18}/>} onClick={handleSubmitWithGoogle}>Entrar com o google</CustomButton>
                 <LoginSubtitle>Ou entre com o seu e-mail</LoginSubtitle>
 
                 <LoginInputContainer>
