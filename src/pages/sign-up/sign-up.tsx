@@ -16,6 +16,9 @@ import { SignUpContainer, SignUpContent, SignUpHeadline, SignUpInputContainer } 
 
 
 import { auth, db } from '../../config/firebase.config'
+import { useContext, useEffect } from 'react'
+import { UserContext } from '../../contexts/user.context'
+import { useNavigate } from 'react-router-dom'
 
 interface SignUpForm {
     nome: string;
@@ -27,6 +30,16 @@ interface SignUpForm {
 
 const SignUpPage = () => {
     const {register, formState: {errors}, handleSubmit, watch, setError} = useForm<SignUpForm>()
+    
+    const {isAuthenticated} = useContext(UserContext)
+
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if(isAuthenticated){
+            navigate('/')
+        }
+    }, [isAuthenticated])
 
     const watchSenha = watch('senha')
 

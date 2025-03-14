@@ -16,6 +16,9 @@ import { LoginContainer, LoginHeadline, LoginInputContainer, LoginSubtitle, Logi
 
 //utilities
 import { auth, db, provider } from "../../config/firebase.config";
+import { useContext, useEffect } from "react";
+import { UserContext } from "../../contexts/user.context";
+import { useNavigate } from "react-router-dom";
 
 interface LoginForm {
     email: string;
@@ -24,7 +27,17 @@ interface LoginForm {
 
 const LoginPage = () => {
     const { register, formState: {errors}, handleSubmit, setError } = useForm<LoginForm>()
+    const {isAuthenticated} = useContext(UserContext)
     
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if(isAuthenticated){
+            navigate('/')
+        }
+
+    }, [isAuthenticated])
+
     const handleSubmitPress = async (data: LoginForm) => {
         try{
             await signInWithEmailAndPassword(auth, data.email, data.password)
