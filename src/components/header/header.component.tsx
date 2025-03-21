@@ -19,10 +19,14 @@ const Header = () => {
         navigate('/sign-up')
     }
 
+    const handleNavigateToInitialPage = () => {
+        navigate('/')
+    }
+
     return (
         
         <HeaderContainer>
-            <HeaderTitle>CLUB CLOTHING</HeaderTitle>
+            <HeaderTitle onClick={handleNavigateToInitialPage}>CLUB CLOTHING</HeaderTitle>
             <HeaderItems>
                 <HeaderItem>Explorar</HeaderItem>
                 {!isAuthenticated && <>
